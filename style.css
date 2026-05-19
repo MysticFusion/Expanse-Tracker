@@ -1,0 +1,339 @@
+/* ================================================================
+   FULL‑SCREEN FINANCIAL DASHBOARD – Matte Professional Aesthetic
+   ================================================================ */
+:root {
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --bg: #F5F7FA;
+  --surface-primary: #FFFFFF;
+  --surface-secondary: #F8FAFC;
+  --surface-hover: #F1F5F9;
+  --border-color: #E2E8F0;
+
+  --text-primary: #0F172A;
+  --text-secondary: #64748B;
+  --text-muted: #94A3B8;
+
+  --accent: #0F766E;
+  --accent-soft: #DFF7F3;
+  --accent-hover: #0E6B62;
+
+  --income: #059669;
+  --expense: #DC2626;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-8: 3rem;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-btn: 10px;
+
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-elevated: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+  --shadow-focus: 0 0 0 3px rgba(15,118,110,0.12);
+  --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  padding: var(--space-5);            /* breathing room around the entire viewport */
+}
+
+.app-container {
+  width: 100%;                       /* full width, no max‑width */
+  max-width: none;                   /* override any previous limit */
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease both;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- Modal ---------- */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(4px);
+  display: flex; justify-content: center; align-items: center; z-index: 1000;
+}
+.modal-card {
+  background: var(--surface-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-elevated);
+  max-width: 420px; width: 90%; padding: var(--space-6);
+}
+.auth-switch { margin-top: var(--space-4); text-align: center; font-size: 0.875rem; color: var(--text-secondary); }
+.auth-switch a { color: var(--accent); font-weight: 500; cursor: pointer; }
+
+/* ---------- Header ---------- */
+.main-header {
+  margin-bottom: var(--space-6);
+}
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-5);
+}
+.logo {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.current-month {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+.btn-icon {
+  background: var(--surface-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: background var(--transition), color var(--transition);
+}
+.btn-icon:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+/* ---------- Tab Nav ---------- */
+.tab-nav {
+  display: flex;
+  gap: var(--space-1);
+  background: var(--surface-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-1);
+}
+.tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-family);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+  justify-content: center;
+}
+.tab .tab-icon { flex-shrink: 0; }
+.tab:hover { background: var(--surface-hover); color: var(--text-primary); }
+.tab.active {
+  background: var(--surface-primary);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.tab-contents { position: relative; }
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.4s ease both; }
+
+/* ---------- Cards ---------- */
+.card {
+  background: var(--surface-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-5);
+  transition: box-shadow var(--transition);
+}
+.card:hover { box-shadow: var(--shadow-elevated); }
+
+/* ---------- Summary Grid (3 cards: Balance hero, Income, Expenses) ---------- */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+.balance-hero {
+  grid-column: span 2;
+  background: linear-gradient(135deg, var(--accent-soft) 0%, #FFFFFF 100%);
+  border: 1px solid var(--accent-soft);
+}
+.card-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-2);
+}
+.card-amount {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.card-amount.income { color: var(--income); }
+.card-amount.expense { color: var(--expense); }
+.card-amount.balance { font-size: 2.25rem; color: var(--text-primary); }
+
+.bounce {
+  animation: balanceBounce 0.5s ease;
+}
+@keyframes balanceBounce {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.05); }
+  50% { transform: scale(0.97); }
+  70% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+/* ---------- Bar Chart ---------- */
+.chart-section, .recent-section { margin-bottom: var(--space-5); }
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: var(--space-4);
+}
+.bar-chart { display: flex; flex-direction: column; gap: var(--space-3); }
+.bar-row { display: flex; align-items: center; gap: var(--space-3); }
+.bar-label {
+  width: 90px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-align: right;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.bar-track { flex: 1; height: 20px; background: var(--surface-hover); border-radius: 10px; overflow: hidden; }
+.bar-fill {
+  height: 100%; background: var(--accent); border-radius: 10px; width: 0%;
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.bar-amount { width: 70px; font-weight: 600; font-size: 0.875rem; }
+
+/* ---------- Transaction List ---------- */
+.transaction-list {
+  display: flex; flex-direction: column; gap: 0; max-height: 420px; overflow-y: auto;
+}
+.transaction-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: var(--space-3) 0; border-bottom: 1px solid var(--border-color);
+}
+.transaction-item:last-child { border-bottom: none; }
+.transaction-info { display: flex; flex-direction: column; gap: 2px; }
+.transaction-meta {
+  display: flex; gap: var(--space-3); font-size: 0.875rem; color: var(--text-secondary);
+}
+.transaction-type { font-weight: 600; text-transform: capitalize; }
+.transaction-type.expense { color: var(--expense); }
+.transaction-type.income { color: var(--income); }
+.transaction-amount { font-weight: 600; font-size: 1rem; }
+.transaction-amount.expense { color: var(--expense); }
+.transaction-amount.income { color: var(--income); }
+.delete-btn {
+  background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary);
+  padding: var(--space-1) var(--space-3); border-radius: var(--radius-sm);
+  cursor: pointer; font-size: 0.8rem; transition: all var(--transition);
+}
+.delete-btn:hover { background: var(--expense); color: white; border-color: var(--expense); }
+
+/* ---------- Two Column ---------- */
+.two-column {
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-5); margin-bottom: var(--space-5);
+}
+
+/* ---------- Forms ---------- */
+.form-group { margin-bottom: var(--space-4); }
+.form-group label {
+  display: block; font-weight: 500; font-size: 0.875rem; margin-bottom: var(--space-1);
+  color: var(--text-primary);
+}
+input, select {
+  width: 100%; padding: var(--space-3) var(--space-4); border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm); font-family: var(--font-family); font-size: 0.9rem;
+  background: var(--surface-primary); transition: border var(--transition), box-shadow var(--transition);
+  color: var(--text-primary);
+}
+input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: var(--shadow-focus); }
+.radio-group { display: flex; gap: var(--space-4); }
+.radio-option { display: flex; align-items: center; gap: var(--space-2); cursor: pointer; font-size: 0.9rem; }
+.btn-primary {
+  width: 100%; padding: var(--space-3) var(--space-4); background: var(--accent); color: white;
+  border: none; border-radius: var(--radius-btn); font-family: var(--font-family);
+  font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  transition: background var(--transition), transform var(--transition);
+}
+.btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+.btn-secondary {
+  background: transparent; border: 1px solid var(--border-color); padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm); font-family: var(--font-family); font-size: 0.85rem;
+  font-weight: 500; cursor: pointer; color: var(--text-secondary); transition: all var(--transition);
+}
+.btn-secondary:hover { background: var(--surface-hover); color: var(--text-primary); }
+.filter-bar {
+  display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-4);
+}
+.filter-bar select, .filter-bar input { width: auto; flex: 1; min-width: 110px; }
+
+/* ---------- Progress (Budget) ---------- */
+.progress-item { margin-bottom: var(--space-4); }
+.progress-label {
+  display: flex; justify-content: space-between; font-size: 0.875rem; margin-bottom: var(--space-1);
+  font-weight: 500;
+}
+.progress-track { height: 18px; background: var(--surface-hover); border-radius: 9px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--accent); border-radius: 9px; width: 0%; transition: width 0.6s; }
+
+/* ---------- Analytics Dual Bar ---------- */
+.dual-bar-row { display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-3); }
+.dual-bar-label { width: 55px; font-weight: 500; font-size: 0.85rem; color: var(--text-secondary); text-align: right; }
+.dual-bar-group { flex: 1; display: flex; align-items: center; gap: var(--space-2); }
+.dual-bar { height: 20px; border-radius: 4px; }
+.dual-bar-income { background: var(--income); }
+.dual-bar-expense { background: var(--expense); }
+.dual-bar-value { font-size: 0.8rem; font-weight: 600; min-width: 60px; }
+
+/* ---------- Doughnut Legend ---------- */
+.legend-item { display: flex; align-items: center; gap: var(--space-2); font-size: 0.85rem; margin-bottom: var(--space-1); }
+.legend-color { width: 12px; height: 12px; border-radius: 3px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+  .summary-grid { grid-template-columns: 1fr 1fr; }
+  .balance-hero { grid-column: span 2; }
+  .two-column { grid-template-columns: 1fr; }
+  .tab { font-size: 0.8rem; padding: var(--space-2) var(--space-2); }
+  .tab span { display: none; }
+  .tab .tab-icon { margin: 0 auto; }
+}
+@media (max-width: 480px) {
+  body { padding: var(--space-4); }
+  .logo { font-size: 1.5rem; }
+}

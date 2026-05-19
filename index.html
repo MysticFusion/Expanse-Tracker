@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Expense Tracker</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230F766E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='2' y='5' width='20' height='14' rx='2'/><line x1='2' y1='10' x2='22' y2='10'/><circle cx='12' cy='15' r='2'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .chart-toggle { display: flex; gap: var(--space-1); margin-bottom: var(--space-4); }
+    .chart-toggle-btn {
+      padding: var(--space-1) var(--space-3); background: var(--surface-primary);
+      border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+      font-family: var(--font-family); font-size: 0.85rem; font-weight: 500;
+      color: var(--text-secondary); cursor: pointer; transition: all var(--transition);
+    }
+    .chart-toggle-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+    .chart-container { display: none; }
+    .chart-container.active { display: block; }
+
+    /* Header layout – single row, icon + title never wrap */
+    .header-top { flex-wrap: nowrap !important; }
+    .header-left { flex: 1 1 auto; min-width: 0; }
+    .header-right { flex-shrink: 0; }
+    .brand-logo { height: 36px; width: auto; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+  <!-- Auth Modal (unchanged) -->
+  <div id="auth-modal" class="modal-overlay">
+    <div class="modal-card">
+      <h2 id="auth-title">Login</h2>
+      <form id="auth-form">
+        <div class="form-group"><label for="email">Email</label><input type="email" id="email" placeholder="you@example.com" required></div>
+        <div class="form-group" id="password-group"><label for="password">Password</label><input type="password" id="password" placeholder="••••••••" required minlength="6"></div>
+        <button type="submit" class="btn-primary" id="auth-submit-btn">Login</button>
+      </form>
+      <p class="auth-switch">Don't have an account? <a href="#" id="toggle-auth">Register</a></p>
+    </div>
+  </div>
+
+    <!-- Main App -->
+  <div id="main-app" class="app-container fade-in" style="display: none;">
+    <header class="main-header">
+      <div class="header-top">
+        <!-- Left: icon + title, separate, aligned with baseline -->
+        <div class="header-left" style="display: flex; align-items: baseline; gap: var(--space-3); min-width: 0;">
+          <!-- Original wallet icon, absolutely no stretching -->
+          <svg class="header-icon" width="39" height="39" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; transform: translateY(5px);">
+            <rect x="2" y="5" width="20" height="14" rx="2"/>
+            <line x1="2" y1="10" x2="22" y2="10"/>
+            <circle cx="12" cy="15" r="2"/>
+          </svg>
+          <h1 class="logo" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Expense Tracker</h1>
+        </div>
+        <!-- Right: logout button -->
+        <div class="header-right">
+          <button id="logout-btn" class="btn-icon" aria-label="Logout">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+      <nav class="tab-nav">
+        <!-- Tabs unchanged -->
+        <button class="tab active" data-tab="dashboard">
+          <svg class="tab-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <span>Dashboard</span>
+        </button>
+        <button class="tab" data-tab="expense">
+          <svg class="tab-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          <span>Transactions</span>
+        </button>
+        <button class="tab" data-tab="budget">
+          <svg class="tab-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/><line x1="16" y1="5" x2="22" y2="5"/><line x1="19" y1="2" x2="19" y2="8"/></svg>
+          <span>Budgets</span>
+        </button>
+        <button class="tab" data-tab="analytics">
+          <svg class="tab-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          <span>Analytics</span>
+        </button>
+        <button class="tab" data-tab="settings">
+          <svg class="tab-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          <span>Settings</span>
+        </button>
+      </nav>
+    </header>
+
+    <!-- Tab contents (identical to previous version) -->
+    <div class="tab-contents">
+      <section class="tab-content active" id="tab-dashboard">
+        <div class="summary-grid" id="summaryGrid">
+          <div class="card balance-hero"><p class="card-label">Balance</p><p class="card-amount balance" id="balanceAmount">$0.00</p></div>
+          <div class="card"><p class="card-label">Income</p><p class="card-amount income" id="totalIncome">$0.00</p></div>
+          <div class="card"><p class="card-label">Expenses</p><p class="card-amount expense" id="totalExpense">$0.00</p></div>
+        </div>
+
+        <div class="chart-section card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3); flex-wrap: wrap; gap: var(--space-2);">
+            <h2 class="section-title" style="margin-bottom:0;">Monthly spending</h2>
+            <div style="display: flex; gap: var(--space-2); align-items: center;">
+              <div style="display: flex; gap: var(--space-1); align-items: center;"><label for="dashboardStartDate" style="font-size:0.8rem;">From</label><input type="date" id="dashboardStartDate" value="" style="width:130px;"></div>
+              <div style="display: flex; gap: var(--space-1); align-items: center;"><label for="dashboardEndDate" style="font-size:0.8rem;">To</label><input type="date" id="dashboardEndDate" value="" style="width:130px;"></div>
+              <button id="applyDateRangeBtn" class="btn-secondary">Apply</button>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3);">
+            <div class="chart-toggle" id="chartToggle">
+              <button class="chart-toggle-btn active" data-chart="bar">Bar</button>
+              <button class="chart-toggle-btn" data-chart="doughnut">Doughnut</button>
+            </div>
+          </div>
+          <div class="chart-container active" id="barChartContainer"><div class="bar-chart" id="barChart"><p class="empty-state">No expense data yet.</p></div></div>
+          <div class="chart-container" id="doughnutChartContainer"><div style="display: flex; align-items: center; gap: 2rem;"><svg id="doughnutChartDashboard" width="200" height="200" viewBox="0 0 200 200"></svg><div id="doughnutLegendDashboard"></div></div></div>
+        </div>
+
+        <div class="recent-section card">
+          <h2 class="section-title">Recent activity</h2>
+          <div class="transaction-list" id="recentTransactionList"><p class="empty-state">No transactions recorded.</p></div>
+        </div>
+      </section>
+
+      <section class="tab-content" id="tab-expense">
+        <div class="two-column">
+          <div class="card">
+            <h2 class="section-title">New transaction</h2>
+            <form id="transactionForm" novalidate>
+              <div class="form-group type-group"><label>Type</label><div class="radio-group"><label class="radio-option"><input type="radio" name="type" value="expense" checked><span class="radio-custom"></span>Expense</label><label class="radio-option"><input type="radio" name="type" value="income"><span class="radio-custom"></span>Income</label></div></div>
+              <div class="form-group"><label for="amount">Amount</label><input type="number" id="amount" step="0.01" min="0.01" placeholder="0.00" required></div>
+              <div class="form-group"><label for="category">Category</label><select id="category" required><option value="">Select category</option><option value="Food">Food</option><option value="Transport">Transport</option><option value="Utilities">Utilities</option><option value="Entertainment">Entertainment</option><option value="Salary">Salary</option><option value="Others">Others</option></select></div>
+              <div class="form-group"><label for="date">Date</label><input type="date" id="date" required></div>
+              <div class="form-group"><label for="note">Note</label><input type="text" id="note" placeholder="Optional note" maxlength="100"></div>
+              <button type="submit" class="btn-primary">Add Transaction</button>
+            </form>
+          </div>
+          <div class="card">
+            <h2 class="section-title">All transactions</h2>
+            <div class="filter-bar">
+              <select id="filterType"><option value="all">All types</option><option value="income">Income</option><option value="expense">Expense</option></select>
+              <select id="filterCategory"><option value="all">All categories</option></select>
+              <input type="date" id="filterDateFrom" placeholder="From"><input type="date" id="filterDateTo" placeholder="To">
+              <button id="applyFilterBtn" class="btn-secondary">Filter</button>
+            </div>
+            <div class="transaction-list" id="allTransactionList"><p class="empty-state">Your transactions will appear here.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-content" id="tab-budget">
+        <div class="card"><h2 class="section-title">Monthly budgets</h2><form id="budgetForm"><div id="budgetFields"><p class="empty-state">Loading budgets...</p></div><button type="submit" class="btn-primary">Save Budgets</button></form></div>
+        <div class="card" style="margin-top:1.5rem;"><h2 class="section-title">Spending vs Budget · This month</h2><div id="budgetProgress"><p class="empty-state">No budgets set.</p></div></div>
+      </section>
+
+      <section class="tab-content" id="tab-analytics">
+        <div class="card"><h2 class="section-title">Income vs Expenses · Last 12 months</h2><div id="analyticsChart"><p class="empty-state">Loading analytics...</p></div></div>
+      </section>
+
+      <section class="tab-content" id="tab-settings">
+        <div class="card" style="max-width:500px;"><h2 class="section-title">Change Password</h2><form id="changePasswordForm"><div class="form-group"><label for="oldPassword">Current Password</label><input type="password" id="oldPassword" required></div><div class="form-group"><label for="newPassword">New Password</label><input type="password" id="newPassword" required minlength="6"></div><button type="submit" class="btn-primary">Update Password</button></form></div>
+      </section>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
